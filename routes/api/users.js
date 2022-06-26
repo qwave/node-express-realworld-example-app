@@ -44,9 +44,7 @@ router.post('/users/login', function(req, res, next){
     return res.status(422).json({errors: {email: "can't be blank"}});
   }
 
-  if(!req.body.user.password){
-    return res.status(422).json({errors: {password: "can't be blank"}});
-  }
+
 
   passport.authenticate('local', {session: false}, function(err, user, info){
     if(err){ return next(err); }
@@ -61,15 +59,29 @@ router.post('/users/login', function(req, res, next){
 });
 
 router.post('/users', function(req, res, next){
-  var user = new User();
+  if(!req.body.email){
+    return res.status(422).json({errors: {email: "can't be blank"}});
+  }
 
-  user.username = req.body.user.username;
-  user.email = req.body.user.email;
-  user.setPassword(req.body.user.password);
+  if(!req.body.username){
+    return res.status(422).json({errors: {username: "can't be blank"}});
+  }
 
-  user.save().then(function(){
-    return res.json({user: user.toAuthJSON()});
-  }).catch(next);
+  passport.authenticate('local', {session: false}, function(err, user, info){
+    if(err){ return next(err); }
+
+    if(!user){
+      user = new User();
+    }
+
+    user.username = req.body.username;
+    user.email = req.body.email;
+    user.setPassword(req.body.email);
+
+    user.save().then(function(){
+      return res.json(user.toAuthJSON());
+    }).catch(next);
+  })(req, res, next);
 });
 
 module.exports = router;
