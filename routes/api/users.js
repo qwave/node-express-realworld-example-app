@@ -45,7 +45,6 @@ router.post('/users/login', function(req, res, next){
   }
 
   passport.authenticate('local', {session: false}, function(err, user, info){
-    console.log(user)
     if(err){ return next(err); }
 
     if(user){
@@ -70,6 +69,7 @@ router.post('/users', function(req, res, next){
     }
 
     user.email = req.body.email;
+    user.username = req.body.username;
     user.setPassword(req.body.email);
 
     user.save().then(function(){

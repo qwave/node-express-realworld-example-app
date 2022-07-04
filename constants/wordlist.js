@@ -1,4 +1,4 @@
-export const Words = [
+const Words = [
     'анонс',
     'блюдо',
     'белок',
@@ -1302,3 +1302,5 @@ export const Words = [
     'ясень',
     'ярлык',
   ];
+
+module.exports = Words;
