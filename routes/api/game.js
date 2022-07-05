@@ -5,8 +5,9 @@ var Game = mongoose.model("Game");
 var auth = require("../auth");
 const Words = require('../../constants/wordlist');
 const dateFns = require('date-fns');
+const {utcToZonedTime} = require('date-fns-tz')
 
-const gameStartDate = '2022-07-04';
+const gameStartDate = process.env.GAME_START_DATE;
 
 router.get('/candemo', auth.required, function (req, res, next) {
     User.findById(req.payload.id)
@@ -29,6 +30,7 @@ router.get('/candemo', auth.required, function (req, res, next) {
 })
 
 router.post("/start", auth.required, function (req, res, next) {
+  //console.log(utcToZonedTime(new Date(), 'Europe/Paris'), new Date());
     User.findById(req.payload.id)
         .then(function (user) {
             if (!user) {
@@ -68,15 +70,15 @@ router.post("/start", auth.required, function (req, res, next) {
                         game.status = 1;
                         game.demo = false;
                         game.start = new Date();
+                        game.duration = 0;
 
                         return game.save().then(function () {
-                            return res.json({id: game.id, time: game.start, status: game.status, solution: game.solution});
+                            return res.json({id: game.id, time: game.start, status: game.status, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration});
                         });
                     }
-
+                    
                     game = games[0];
                     // game finished
-                    console.log(dateFns.differenceInDays(game.start, currentTimestamp));
                     if (game.status > 1 && games.length < maxGamesPerDay) {
                         game = new Game();
                         game.user = user.id;
@@ -85,12 +87,15 @@ router.post("/start", auth.required, function (req, res, next) {
                         game.status = 1;
                         game.demo = false;
                         game.start = new Date();
+                        game.duration = 0;
 
                         return game.save().then(function () {
-                            return res.json({id: game.id, time: game.start, status: game.status, solution: game.solution});
+                            return res.json({id: game.id, time: game.start, status: game.status, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration});
                         });
                     } else if (game.status === 1) {
-                        return res.json({id: game.id, time: game.start, status: game.status, attempts: game.attempts, solution: game.solution });
+                        game.duration = dateFns.differenceInSeconds(new Date(), game.start);
+                        console.log(game.duration);
+                        return res.json({id: game.id, time: game.start, status: game.status, attempts: game.attempts, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration});
                     }
 
                     return res.sendStatus(400); // max games per day exceeded
