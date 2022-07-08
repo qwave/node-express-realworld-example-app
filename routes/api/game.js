@@ -37,7 +37,24 @@ router.get('/rating', auth.required, function (req, res, next) {
             }
 
             return getRanking().then((ranking) => {
-                res.send(ranking.slice(0, 10));
+                let position = ranking.findIndex(r => {
+                    return r.id.toString() === user.id.toString();
+                });
+                if (position < 10) {
+                    let result = ranking.slice(0, 10);
+                    if (position >= 0)
+                        result[position].position = position;
+                    res.send(result);
+                }
+                else {
+                    let result = ranking.slice(0, 9);
+                    let userRanking = ranking[position];
+                    userRanking.position = position;
+
+                    result.push(userRanking);
+                    res.send(result);
+                }
+
             });
         })
         .catch(next);
