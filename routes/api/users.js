@@ -109,7 +109,7 @@ router.post("/users/status", auth.required, function (req, res, next) {
       })
         .sort({ start: -1 })
         .then((games) => {
-          response.status = ((!games || !games.length) || games[0].status === 1 || games[0].length < maxGamesPerDay) ? 0 : 1;
+          response.status = ((!games || !games.length) || games[0].status === 1 || games.length < maxGamesPerDay) ? 0 : 1;
 
           response.day = dateFns.differenceInCalendarDays(
             currentTimestamp,
