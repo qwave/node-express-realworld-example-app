@@ -29,6 +29,20 @@ router.get('/candemo', auth.required, function (req, res, next) {
         .catch(next);
 })
 
+router.get('/rating', auth.required, function (req, res, next) {
+    User.findById(req.payload.id)
+        .then(function (user) {
+            if (!user) {
+                return res.sendStatus(401);
+            }
+
+            return getRanking().then((ranking) => {
+                res.send(ranking.slice(0, 10));
+            });
+        })
+        .catch(next);
+})
+
 router.post("/start", auth.required, function (req, res, next) {
   //console.log(utcToZonedTime(new Date(), 'Europe/Paris'), new Date());
     User.findById(req.payload.id)
@@ -53,16 +67,21 @@ router.post("/start", auth.required, function (req, res, next) {
 
             const todayStart = new Date(currentTimestamp.setHours(6, 0, 0, 0)); // 7am msk
             const tomorrowStart = dateFns.addDays(new Date(new Date().setHours(6, 0, 0, 0)), 1);
-            return Game.find({
-                start: {
-                    $gte: todayStart,
-                    $lt: tomorrowStart,
-                },
-            })
-                .sort({start: -1})
-                .then((games) => {
+            
+            getRanking().then((ranking) => {
+                let position = ranking.findIndex(r => {
+                    return r.id.toString() === user.id.toString();
+                });
+
+                return Game.find({
+                    start: {
+                        $gte: todayStart,
+                        $lt: tomorrowStart,
+                    },
+                    user: user.id
+                }).sort({start: -1}).then((games) => {
                     let game;
-                    if (!games || !games.length) {
+                    if (!games || !games.length || (games[0].status > 1 && games.length < maxGamesPerDay)) {
                         game = new Game();
                         game.user = user.id;
                         game.solution = Words[Math.floor(Math.random() * Words.length)];
@@ -73,33 +92,20 @@ router.post("/start", auth.required, function (req, res, next) {
                         game.duration = 0;
 
                         return game.save().then(function () {
-                            return res.json({id: game.id, time: game.start, status: game.status, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration});
+                            return res.json({id: game.id, time: game.start, status: game.status, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration, position: position, rankingcount: ranking.length });
                         });
                     }
                     
                     game = games[0];
-                    // game finished
-                    if (game.status > 1 && games.length < maxGamesPerDay) {
-                        game = new Game();
-                        game.user = user.id;
-                        game.solution = Words[Math.floor(Math.random() * Words.length)];
-                        game.attempts = [];
-                        game.status = 1;
-                        game.demo = false;
-                        game.start = new Date();
-                        game.duration = 0;
-
-                        return game.save().then(function () {
-                            return res.json({id: game.id, time: game.start, status: game.status, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration});
-                        });
-                    } else if (game.status === 1) {
+                    if (game.status === 1) {
                         game.duration = dateFns.differenceInSeconds(new Date(), game.start);
                         console.log(game.duration);
-                        return res.json({id: game.id, time: game.start, status: game.status, attempts: game.attempts, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration});
+                        return res.json({id: game.id, time: game.start, status: game.status, attempts: game.attempts, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration, position: position, rankingcount: ranking.length });
                     }
 
-                    return res.sendStatus(400); // max games per day exceeded
+                    return res.json({msg: 'no more games today'}); // max games per day exceeded
                 });
+            });
         })
         .catch(next);
 });
@@ -149,5 +155,41 @@ router.post('/attempt', auth.required, function (req, res, next) {
                 });
         }).catch(next);
 });
+
+const getRanking = () => {
+    return new Promise((resolve, reject) => {
+        User.aggregate([{
+            $lookup: {
+                from: "games", 
+                pipeline: [{ 
+                    $match : {
+                        status: 3,
+                        demo: false
+                    }
+                }],
+                localField: "_id",
+                foreignField: "user",
+                as: "games"
+            }
+        }]).exec(function(err, users) {
+            let ranking = users.filter(x => x.games.length > 0).map(function(user) {
+                var gameTimes = user.games.map((game) => dateFns.differenceInSeconds(game.end, game.start));
+                
+                return {
+                    id: user._id,
+                    name: user.username,
+                    wordcount: user.games.length || 0,
+                    time: gameTimes.reduce((a, b) => a + b, 0)
+                };
+            });
+
+            ranking = ranking.sort(function (a, b) {
+                return b.wordcount - a.wordcount || a.time - b.time;
+            });
+
+            resolve(ranking);
+        });
+    })
+  }
 
 module.exports = router;

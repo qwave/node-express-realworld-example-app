@@ -105,6 +105,7 @@ router.post("/users/status", auth.required, function (req, res, next) {
           $gte: todayStart,
           $lt: tomorrowStart,
         },
+        user: user.id
       })
         .sort({ start: -1 })
         .then((games) => {
