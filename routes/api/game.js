@@ -101,7 +101,7 @@ router.post("/start", auth.required, function (req, res, next) {
                     if (!games || !games.length || (games[0].status > 1 && games.length < maxGamesPerDay)) {
                         game = new Game();
                         game.user = user.id;
-                        game.solution = Words[Math.floor(Math.random() * Words.length)];
+                        game.solution = Words[Math.floor(Math.random() * 100)];
                         game.attempts = [];
                         game.status = 1;
                         game.demo = false;
