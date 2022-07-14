@@ -189,6 +189,11 @@ const getRanking = () => {
                 as: "games"
             }
         }]).exec(function(err, users) {
+            if (!users) {
+                resolve([]);
+                return;
+            };
+            
             let ranking = users.filter(x => x.games.length > 0).map(function(user) {
                 var gameTimes = user.games.map((game) => dateFns.differenceInSeconds(game.end, game.start));
                 
