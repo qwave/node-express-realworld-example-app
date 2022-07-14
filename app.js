@@ -10,11 +10,12 @@ var http = require('http'),
     mongoose = require('mongoose'),
     dotenv = require('dotenv');
 
+dotenv.config();
+
 var isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object
 var app = express();
-dotenv.config();
 
 app.use(cors());
 
