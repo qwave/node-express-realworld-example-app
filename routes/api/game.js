@@ -178,17 +178,20 @@ const getRanking = () => {
         User.aggregate([{
             $lookup: {
                 from: "games", 
-                pipeline: [{ 
-                    $match : {
-                        status: 3,
-                        demo: false
-                    }
-                }],
+                // pipeline: [{ 
+                //     $match : {
+                //         status: 3,
+                //         demo: false
+                //     }
+                // }],
                 localField: "_id",
                 foreignField: "user",
                 as: "games"
             }
         }]).exec(function(err, users) {
+            users.map(x =>
+                x.games = x.games.filter(g => !g.demo && g.status === 3)
+            );
             if (!users) {
                 resolve([]);
                 return;
