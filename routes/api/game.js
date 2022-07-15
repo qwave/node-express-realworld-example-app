@@ -189,16 +189,17 @@ const getRanking = () => {
                 as: "games"
             }
         }]).exec(function(err, users) {
-            users.map(x =>
-                x.games = x.games.filter(g => !g.demo && g.status === 3)
-            );
             if (!users) {
                 resolve([]);
                 return;
             };
+
+            users.map(x =>
+                x.games = x.games.filter(g => !g.demo && g.status === 3)
+            );
             
-            let ranking = users.filter(x => x.games.length > 0).map(function(user) {
-                var gameTimes = user.games.map((game) => dateFns.differenceInSeconds(game.end, game.start));
+            let ranking = users.filter(x => x.games.length > 0).map(user => {
+                var gameTimes = user.games.map(game => dateFns.differenceInSeconds(game.end, game.start));
                 
                 return {
                     id: user._id,
@@ -208,9 +209,7 @@ const getRanking = () => {
                 };
             });
 
-            ranking = ranking.sort(function (a, b) {
-                return b.wordcount - a.wordcount || a.time - b.time;
-            });
+            ranking = ranking.sort((a, b) => b.wordcount - a.wordcount || a.time - b.time);
 
             resolve(ranking);
         });
