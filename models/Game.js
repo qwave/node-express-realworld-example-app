@@ -9,6 +9,7 @@ var GameSchema = new mongoose.Schema(
         demo: {type: Boolean},
         start: {type: Date},
         end: {type: Date},
+        fact: {type: Number},
     },
     {timestamps: true}
 );
