@@ -148,6 +148,7 @@ router.post('/attempt', auth.required, function (req, res, next) {
                     $lt: tomorrowStart,
                 },
                 status: 1,
+                user: user.id
             })
                 .sort({start: -1})
                 .then((game) => {
@@ -178,7 +179,7 @@ router.post('/attempt', auth.required, function (req, res, next) {
                     }
 
                     Game.find({
-                        status: 3,
+                        fact: { $gt: 0 },
                         user: user.id
                     }).then((games) => {
                         let displayedFacts = games.map((g) => g.fact);
