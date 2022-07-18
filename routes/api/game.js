@@ -116,7 +116,6 @@ router.post("/start", auth.required, function (req, res, next) {
                     game = games[0];
                     if (game.status === 1) {
                         game.duration = dateFns.differenceInSeconds(new Date(), game.start);
-                        console.log(game.duration);
                         return res.json({id: game.id, time: game.start, status: game.status, attempts: game.attempts, solution: Buffer.from(game.solution).toString('base64'), duration: game.duration, position: position, rankingcount: ranking.length });
                     }
 
