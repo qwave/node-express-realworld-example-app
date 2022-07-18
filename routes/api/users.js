@@ -83,6 +83,9 @@ router.post("/users/status", auth.required, function (req, res, next) {
       const gsd = dateFns.parseISO(gameStartDate);
       let currentTimestamp = new Date();
 
+      if (currentTimestamp.getHours() < 6)
+        currentTimestamp = dateFns.addDays(currentTimestamp, -1);
+
       let maxGamesPerDay;
       if (dateFns.differenceInDays(gsd, currentTimestamp) === 0) {
         maxGamesPerDay = 1;
@@ -91,8 +94,6 @@ router.post("/users/status", auth.required, function (req, res, next) {
       } else if (dateFns.differenceInDays(currentTimestamp, gsd) > 1) {
         maxGamesPerDay = 3;
       }
-      if (currentTimestamp.getHours() < 6)
-        currentTimestamp = dateFns.addDays(currentTimestamp, -1);
 
       const todayStart = new Date(currentTimestamp.setHours(6, 0, 0, 0)); // 7am msk
       const tomorrowStart = dateFns.addDays(
