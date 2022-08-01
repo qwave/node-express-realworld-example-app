@@ -83,7 +83,7 @@ router.post("/users/status", auth.required, function (req, res, next) {
       const gsd = dateFns.parseISO(gameStartDate);
       let currentTimestamp = new Date();
 
-      if (currentTimestamp.getHours() < 6)
+      if (currentTimestamp.getHours() < 10)
         currentTimestamp = dateFns.addDays(currentTimestamp, -1);
 
       let maxGamesPerDay;
@@ -95,9 +95,9 @@ router.post("/users/status", auth.required, function (req, res, next) {
         maxGamesPerDay = 3;
       }
 
-      const todayStart = new Date(currentTimestamp.setHours(6, 0, 0, 0)); // 7am msk
+      const todayStart = new Date(currentTimestamp.setHours(10, 0, 0, 0)); // 7am msk
       const tomorrowStart = dateFns.addDays(
-        new Date(new Date().setHours(6, 0, 0, 0)),
+        new Date(new Date().setHours(10, 0, 0, 0)),
         1
       );
 
@@ -110,11 +110,11 @@ router.post("/users/status", auth.required, function (req, res, next) {
       })
         .sort({ start: -1 })
         .then((games) => {
-          response.status = ((!games || !games.length) || games[0].status === 1 || games.length < maxGamesPerDay) ? 0 : 1;
+          response.status = ((!games || !games.length) || games[0].status === 1 || games.length < maxGamesPerDay) ? 0 : 1; // 0 - no game, 1 - has game
 
           response.day = dateFns.differenceInCalendarDays(
             currentTimestamp,
-            dateFns.parseISO(gameStartDate)
+            gsd
           );
     
           return res.json(response);
