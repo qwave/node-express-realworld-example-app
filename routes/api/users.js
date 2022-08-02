@@ -83,7 +83,7 @@ router.post("/users/status", auth.required, function (req, res, next) {
       const gsd = dateFns.parseISO(gameStartDate);
       let currentTimestamp = new Date();
 
-      if (currentTimestamp.getHours() < 10)
+      if (currentTimestamp.getHours() < 4)
         currentTimestamp = dateFns.addDays(currentTimestamp, -1);
 
       let maxGamesPerDay;
@@ -95,9 +95,9 @@ router.post("/users/status", auth.required, function (req, res, next) {
         maxGamesPerDay = 3;
       }
 
-      const todayStart = new Date(currentTimestamp.setHours(10, 0, 0, 0)); // 7am msk
+      const todayStart = new Date(currentTimestamp.setHours(4, 0, 0, 0)); // 7am msk
       const tomorrowStart = dateFns.addDays(
-        new Date(new Date().setHours(10, 0, 0, 0)),
+        new Date(new Date().setHours(4, 0, 0, 0)),
         1
       );
 

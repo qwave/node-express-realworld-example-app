@@ -71,7 +71,7 @@ router.post("/start", auth.required, function (req, res, next) {
             const gsd = dateFns.parseISO(gameStartDate)
             let currentTimestamp = new Date()
 
-            if (currentTimestamp.getHours() < 10)
+            if (currentTimestamp.getHours() < 4)
             currentTimestamp = dateFns.addDays(currentTimestamp, -1);
 
             let maxGamesPerDay;
@@ -84,8 +84,8 @@ router.post("/start", auth.required, function (req, res, next) {
             }
             
 
-            const todayStart = new Date(currentTimestamp.setHours(10, 0, 0, 0));
-            const tomorrowStart = dateFns.addDays(new Date(new Date().setHours(10, 0, 0, 0)), 1);
+            const todayStart = new Date(currentTimestamp.setHours(4, 0, 0, 0));
+            const tomorrowStart = dateFns.addDays(new Date(new Date().setHours(4, 0, 0, 0)), 1);
             
             getRanking().then((ranking) => {
                 let position = ranking.findIndex(r => {
@@ -136,10 +136,10 @@ router.post('/attempt', auth.required, function (req, res, next) {
             }
             
             let currentTimestamp = new Date()
-            if (currentTimestamp.getHours() < 6)
+            if (currentTimestamp.getHours() < 4)
             currentTimestamp = dateFns.addDays(currentTimestamp, -1);
-            const todayStart = new Date(currentTimestamp.setHours(6, 0, 0, 0)); // 7am msk
-            const tomorrowStart = dateFns.addDays(new Date(currentTimestamp.setHours(6, 0, 0, 0)), 1);
+            const todayStart = new Date(currentTimestamp.setHours(4, 0, 0, 0)); // 7am msk
+            const tomorrowStart = dateFns.addDays(new Date(currentTimestamp.setHours(4, 0, 0, 0)), 1);
             return Game.findOne({
                 start: {
                     $gte: todayStart,
