@@ -71,7 +71,7 @@ router.post("/start", auth.required, function (req, res, next) {
             const gsd = dateFns.parseISO(gameStartDate)
             let currentTimestamp = new Date()
 
-            if (currentTimestamp.getHours() < 4)
+            if (currentTimestamp.getUTCHours() < 4)
             currentTimestamp = dateFns.addDays(currentTimestamp, -1);
 
             let maxGamesPerDay;
@@ -136,7 +136,7 @@ router.post('/attempt', auth.required, function (req, res, next) {
             }
             
             let currentTimestamp = new Date()
-            if (currentTimestamp.getHours() < 4)
+            if (currentTimestamp.getUTCHours() < 4)
             currentTimestamp = dateFns.addDays(currentTimestamp, -1);
             const todayStart = new Date(currentTimestamp.setHours(4, 0, 0, 0)); // 7am msk
             const tomorrowStart = dateFns.addDays(new Date(currentTimestamp.setHours(4, 0, 0, 0)), 1);

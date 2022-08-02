@@ -83,7 +83,7 @@ router.post("/users/status", auth.required, function (req, res, next) {
       const gsd = dateFns.parseISO(gameStartDate);
       let currentTimestamp = new Date();
 
-      if (currentTimestamp.getHours() < 4)
+      if (currentTimestamp.getUTCHours() < 4)
         currentTimestamp = dateFns.addDays(currentTimestamp, -1);
 
       let maxGamesPerDay;
