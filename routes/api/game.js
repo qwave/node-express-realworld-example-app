@@ -106,7 +106,7 @@ router.post("/start", auth.required, function (req, res, next) {
                         game.solution = Words[Math.floor(Math.random() * 100)];
                         game.attempts = [];
                         game.status = 1;
-                        game.demo = dateFns.differenceInDays(gsd, currentTimestamp) === 0 && games && games.length < 3;
+                        game.demo = dateFns.differenceInDays(gsd, currentTimestamp) === 0 && games && games.length < 1;
                         game.start = new Date();
                         game.duration = 0;
 
