@@ -68,7 +68,7 @@ router.post("/start", auth.required, function (req, res, next) {
                 return res.sendStatus(401);
             }
 
-            const gsd = dateFns.parseISO(gameStartDate)
+            const gsd = new Date(gameStartDate)
             let currentTimestamp = new Date()
 
             if (currentTimestamp.getUTCHours() < 4)
