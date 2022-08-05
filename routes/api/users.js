@@ -94,17 +94,12 @@ router.post("/users/status", auth.required, function (req, res, next) {
       } else if (dateFns.differenceInDays(currentTimestamp, gsd) > 1) {
         maxGamesPerDay = 3;
       }
-
-      const todayStart = new Date(currentTimestamp.setHours(4, 0, 0, 0)); // 7am msk
-      const tomorrowStart = dateFns.addDays(
-        new Date(new Date().setHours(4, 0, 0, 0)),
-        1
-      );
+ 
+      const todayStart = new Date(currentTimestamp.setUTCHours(4, 0, 0, 0)); // 7am msk
 
       Game.find({
         start: {
-          $gte: todayStart,
-          $lt: tomorrowStart,
+          $gte: todayStart
         },
         user: user.id
       })

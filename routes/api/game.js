@@ -72,7 +72,7 @@ router.post("/start", auth.required, function (req, res, next) {
             let currentTimestamp = new Date()
 
             if (currentTimestamp.getUTCHours() < 4)
-            currentTimestamp = dateFns.addDays(currentTimestamp, -1);
+                currentTimestamp = dateFns.addDays(currentTimestamp, -1);
 
             let maxGamesPerDay;
             if (dateFns.differenceInDays(gsd, currentTimestamp) === 0) {
@@ -84,8 +84,7 @@ router.post("/start", auth.required, function (req, res, next) {
             }
             
 
-            const todayStart = new Date(currentTimestamp.setHours(4, 0, 0, 0));
-            const tomorrowStart = dateFns.addDays(new Date(new Date().setHours(4, 0, 0, 0)), 1);
+            const todayStart = new Date(currentTimestamp.setUTCHours(4, 0, 0, 0));
             
             getRanking().then((ranking) => {
                 let position = ranking.findIndex(r => {
@@ -94,8 +93,7 @@ router.post("/start", auth.required, function (req, res, next) {
 
                 return Game.find({
                     start: {
-                        $gte: todayStart,
-                        $lt: tomorrowStart,
+                        $gte: todayStart
                     },
                     user: user.id
                 }).sort({start: -1}).then((games) => {
@@ -138,12 +136,10 @@ router.post('/attempt', auth.required, function (req, res, next) {
             let currentTimestamp = new Date()
             if (currentTimestamp.getUTCHours() < 4)
             currentTimestamp = dateFns.addDays(currentTimestamp, -1);
-            const todayStart = new Date(currentTimestamp.setHours(4, 0, 0, 0)); // 7am msk
-            const tomorrowStart = dateFns.addDays(new Date(currentTimestamp.setHours(4, 0, 0, 0)), 1);
+            const todayStart = new Date(currentTimestamp.setUTCHours(4, 0, 0, 0)); // 7am msk
             return Game.findOne({
                 start: {
-                    $gte: todayStart,
-                    $lt: tomorrowStart,
+                    $gte: todayStart
                 },
                 status: 1,
                 user: user.id
