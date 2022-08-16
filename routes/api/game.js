@@ -42,13 +42,13 @@ router.get('/rating', auth.required, function (req, res, next) {
                     return r.id.toString() === user.id.toString();
                 });
                 if (position < 11) {
-                    let result = ranking.slice(0, 10);
+                    let result = ranking.slice(0, 11);
                     if (position >= 0)
                         result[position].position = position;
                     res.send(result);
                 }
                 else {
-                    let result = ranking.slice(0, 9);
+                    let result = ranking.slice(0, 10);
                     let userRanking = ranking[position];
                     userRanking.position = position;
 
