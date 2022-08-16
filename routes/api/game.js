@@ -41,7 +41,7 @@ router.get('/rating', auth.required, function (req, res, next) {
                 let position = ranking.findIndex(r => {
                     return r.id.toString() === user.id.toString();
                 });
-                if (position < 10) {
+                if (position < 11) {
                     let result = ranking.slice(0, 10);
                     if (position >= 0)
                         result[position].position = position;
@@ -223,6 +223,7 @@ const getRanking = () => {
                 return {
                     id: user._id,
                     name: user.username,
+                    email: user.email,
                     wordcount: user.games.length || 0,
                     time: gameTimes.reduce((a, b) => a + b, 0)
                 };
